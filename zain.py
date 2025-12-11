@@ -29,3 +29,19 @@ n = len(df)
 time_index = np.arange(n)
 simulated_NOx = 50 + 30*np.sin(2 * np.pi * time_index / 24) + np.random.normal(0, 5, n)
 simulated_NOx[simulated_NOx < 0] = 0
+# Part 3: Visualization and top readings
+df['NOx(GT)_Simulated'] = simulated_NOx
+
+plt.figure(figsize=(12,6))
+plt.plot(df.index, df['NOx(GT)_Simulated'], color='green', linewidth=2, label='Simulated NOx')
+plt.scatter(df.index, df['NOx(GT)_Simulated'], color='darkgreen', s=10)
+plt.title("NOx Trend - Simulated Curve")
+plt.xlabel("Measurement Index")
+plt.ylabel("NOx Concentration (µg/m³)")
+plt.grid(True)
+plt.legend()
+plt.tight_layout()
+plt.show()
+
+top_NOx = df['NOx(GT)_Simulated'].sort_values(ascending=False).head(10)
+print("Top NOx readings:\n", top_NOx)
