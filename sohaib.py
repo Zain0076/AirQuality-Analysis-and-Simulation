@@ -67,3 +67,11 @@ for gas in ['CO(GT)', 'NOx(GT)', 'NO2(GT)']:
     plt.xticks(rotation=45)
     plt.grid(True)
     plt.show()
+# 12) Save personal output and provide download link
+out_name = "taimoor_gas_aqi_alerts.csv"
+df.to_csv(out_name, index=False)
+
+from google.colab import files
+files.download(out_name)
+
+print(f"\nSaved and started download: {out_name}")
