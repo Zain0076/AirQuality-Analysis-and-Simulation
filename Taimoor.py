@@ -101,3 +101,29 @@ if vc_plot.sum() > 0:
     plt.show()
 else:
     print("No non-Unknown AQI categories to plot.")
+# ALERT SYSTEM: thresholds and alert rows
+CO_THRESHOLD = 5
+NO2_THRESHOLD = 200
+GAS_AQI_THRESHOLD = 150
+
+def gas_alerts(row):
+    a = []
+    if "CO(GT)" in row.index and not pd.isna(row["CO(GT)"]) and row["CO(GT)"] > CO_THRESHOLD:
+        a.append("High CO")
+    if "NO2(GT)" in row.index and not pd.isna(row["NO2(GT)"]) and row["NO2(GT)"] > NO2_THRESHOLD:
+        a.append("High NO2")
+    if not pd.isna(row["Gas_AQI"]) and row["Gas_AQI"] > GAS_AQI_THRESHOLD:
+        a.append("High Gas_AQI")
+    return a
+
+df["Alerts"] = df.apply(gas_alerts, axis=1)
+alerts_df = df[df["Alerts"].apply(lambda x: len(x) > 0)].copy()
+print("\nNumber of alert rows found:", len(alerts_df))
+display(alerts_df[["Datetime"] + used_cols + ["Gas_AQI","AQI_Category","Alerts"]].head(10))
+
+# Save output and provide download link
+out_name = "taimoor_gas_aqi_alerts.csv"
+df.to_csv(out_name, index=False)
+from google.colab import files
+files.download(out_name)
+print(f"\nSaved and started download: {out_name}")
