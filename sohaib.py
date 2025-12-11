@@ -42,3 +42,28 @@ print("Gas columns found:", found)
 df.replace(-200, pd.NA, inplace=True)
 for c in found:
     df[c] = pd.to_numeric(df[c], errors="coerce")
+#Gas Pollutants Analysis
+
+# Average Gas Concentrations
+avg_gases = df[['CO(GT)', 'NOx(GT)', 'NO2(GT)']].mean()
+avg_gases.plot(kind='bar', color=['blue','green','red'], figsize=(8,5))
+plt.title("Average Gas Pollutant Concentration")
+plt.ylabel("Concentration")
+plt.show()
+
+# Correlation Heatmap
+plt.figure(figsize=(6,5))
+sns.heatmap(df[['CO(GT)', 'NOx(GT)', 'NO2(GT)']].corr(), annot=True, cmap='coolwarm')
+plt.title("Correlation Between Gas Pollutants")
+plt.show()
+
+# Gas Trends Over Time
+for gas in ['CO(GT)', 'NOx(GT)', 'NO2(GT)']:
+    plt.figure(figsize=(12,6))
+    plt.plot(df['Datetime'], df[gas], marker='o')
+    plt.title(f"{gas} Trend Over Time")
+    plt.xlabel("Datetime")
+    plt.ylabel(f"{gas} Concentration")
+    plt.xticks(rotation=45)
+    plt.grid(True)
+    plt.show()
