@@ -45,3 +45,10 @@ plt.show()
 
 top_NOx = df['NOx(GT)_Simulated'].sort_values(ascending=False).head(10)
 print("Top NOx readings:\n", top_NOx)
+# Part 4: Export and download CSV
+out_name = "taimoor_gas_aqi_alerts.csv"
+df.to_csv(out_name, index=False)
+
+from google.colab import files
+files.download(out_name)
+print(f"\nSaved and started download: {out_name}")
