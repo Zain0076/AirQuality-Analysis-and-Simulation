@@ -48,3 +48,56 @@ if not used_cols:
 df["Gas_AQI"] = 0.0
 for c in used_cols:
     df["Gas_AQI"] += df[c].fillna(0) * weights.get(c, 1.0)
+# Classify Gas_AQI into categories
+def classify(v):
+    if pd.isna(v): return "Unknown"
+    v = float(v)
+    if v <= 50: return "Good"
+    if v <= 100: return "Moderate"
+    if v <= 150: return "Unhealthy for Sensitive"
+    if v <= 200: return "Unhealthy"
+    if v <= 300: return "Very Unhealthy"
+    return "Hazardous"
+
+df["AQI_Category"] = df["Gas_AQI"].apply(classify)
+
+# Show stats
+print("\nGas_AQI summary:")
+display(df["Gas_AQI"].describe())
+print("\nAQI category counts:")
+display(df["AQI_Category"].value_counts(dropna=False))
+display(df[["Datetime"] + used_cols + ["Gas_AQI","AQI_Category"]].head(8))
+
+# Plot 1: Gas_AQI over time
+plt.figure(figsize=(12,4))
+plot_df = df.dropna(subset=["Datetime","Gas_AQI"])
+plt.plot(plot_df["Datetime"], plot_df["Gas_AQI"], marker='.', linewidth=0.6)
+plt.xlabel("Datetime")
+plt.ylabel("Gas_AQI")
+plt.title("Gas-Based AQI Over Time")
+plt.tight_layout()
+plt.show()
+
+# Plot 2: CO distribution
+if "CO(GT)" in df.columns:
+    plt.figure(figsize=(8,4))
+    sns.histplot(df["CO(GT)"].dropna(), bins=40, kde=True)
+    plt.title("CO(GT) Distribution")
+    plt.xlabel("CO (GT)")
+    plt.show()
+else:
+    print("CO(GT) not present; skipping CO histogram.")
+
+# Plot 3: AQI Category distribution
+vc = df["AQI_Category"].value_counts()
+vc_plot = vc.drop(labels=["Unknown"], errors='ignore')
+if vc_plot.sum() > 0:
+    plt.figure(figsize=(8,4))
+    vc_plot.plot(kind="bar")
+    plt.title("Gas AQI Category Distribution")
+    plt.xlabel("AQI Category")
+    plt.ylabel("Count")
+    plt.tight_layout()
+    plt.show()
+else:
+    print("No non-Unknown AQI categories to plot.")
